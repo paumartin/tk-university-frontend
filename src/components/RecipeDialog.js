@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
 
 function RecipeDialog(props) {
   const classes = useStyles();
-  const { initialName, initialDescription, open, toggleDialog, dialogTitle, sendForm } = props;
+  const { initialName, initialDescription, open, toggleDialog, title, sendForm } = props;
 
   const [ name, setName, resetName ] = useInputState(initialName);
   const [ description, setDescription, resetDescription ] = useInputState(initialDescription);
@@ -48,7 +48,7 @@ function RecipeDialog(props) {
       open={open}
       onClose={handleClose}
     >
-      <DialogTitle>{dialogTitle}</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>
           Insert the name and the description of the recipe

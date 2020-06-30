@@ -47,6 +47,20 @@ function RecipeApp() {
     const recipe = { id: uuid(), name, description };
     setRecipes([ ...recipes, recipe ]);
   }
+  function updateRecipe(id, name, description) {
+    // TODO: Call API
+    const updatedRecipes = recipes.map(recipe => {
+      return recipe.id === id ?
+        { ...recipe, name, description } :
+        recipe;
+    });
+    setRecipes(updatedRecipes);
+  }
+  function deleteRecipe(id) {
+    // TODO: Call API
+    const updatedRecipes = recipes.filter(recipe => recipe.id !== id);
+    setRecipes(updatedRecipes);
+  }
   function createIngredient(recipeId, ingredientName) {
     // TODO: Call API
     const ingredient = { id: uuid(), name: ingredientName };
@@ -89,11 +103,12 @@ function RecipeApp() {
       </AppBar>
       <RecipeList
         recipes={recipes}
+        updateRecipe={updateRecipe}
         createIngredient={createIngredient}
         deleteIngredient={deleteIngredient}
       />
       <RecipeDialog
-        dialogTitle='Create recipe'
+        title='Create recipe'
         open={dialogOpen}
         toggleDialog={toggleDialog}
         sendForm={createRecipe}
