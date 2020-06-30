@@ -104,6 +104,7 @@ function RecipeApp() {
       <RecipeList
         recipes={recipes}
         updateRecipe={updateRecipe}
+        deleteRecipe={deleteRecipe}
         createIngredient={createIngredient}
         deleteIngredient={deleteIngredient}
       />

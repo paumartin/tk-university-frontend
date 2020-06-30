@@ -14,16 +14,18 @@ import useToggle from '../hooks/useToggle';
 
 import IngredientList from './IngredientList';
 import RecipeDialog from './RecipeDialog';
+import RecipeDeleteDialog from './RecipeDeleteDialog';
 
 function RecipeDetail(props) {
-  const { id, name, description, ingredients = [],
-    updateRecipe, createIngredient, deleteIngredient } = props;
+  const {
+    id, name, description, ingredients = [],
+    updateRecipe, deleteRecipe,
+    createIngredient, deleteIngredient
+  } = props;
   const [ anchorEl, setAnchorEl ] = useState(null);
-  const [ dialogOpen, toggleDialog ] = useToggle();
+  const [ editDialogOpen, toggleEditDialog ] = useToggle();
+  const [ deleteDialogOpen, toggleDeleteDialog ] = useToggle();
 
-  function handleSendForm(updatedName, updatedDescription) {
-    updateRecipe(id, updatedName, updatedDescription);
-  }
   function handleClick(event) {
     setAnchorEl(event.currentTarget);
   }
@@ -31,12 +33,18 @@ function RecipeDetail(props) {
     setAnchorEl(null);
   }
   function handleEdit() {
-    toggleDialog();
+    toggleEditDialog();
     handleClose();
   }
   function handleDelete() {
-    // TODO: Show confirm delete
+    toggleDeleteDialog();
     handleClose();
+  }
+  function handleSendForm(updatedName, updatedDescription) {
+    updateRecipe(id, updatedName, updatedDescription);
+  }
+  function handleDeleteRecipe() {
+    deleteRecipe(id);
   }
 
   return (
@@ -70,11 +78,16 @@ function RecipeDetail(props) {
       </Menu>
       <RecipeDialog
         title='Edit recipe'
-        open={dialogOpen}
-        toggleDialog={toggleDialog}
+        open={editDialogOpen}
+        toggleDialog={toggleEditDialog}
         sendForm={handleSendForm}
         initialName={name}
         initialDescription={description}
+      />
+      <RecipeDeleteDialog
+        open={deleteDialogOpen}
+        toggleDialog={toggleDeleteDialog}
+        deleteRecipe={handleDeleteRecipe}
       />
     </Card>
   );
