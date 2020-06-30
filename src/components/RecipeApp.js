@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { v4 as uuid } from 'uuid';
+import React, { useState, useEffect } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -9,6 +8,9 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 
 import useToggle from '../hooks/useToggle';
+
+import * as IngredientService from '../services/ingredient.service';
+import * as RecipeService from '../services/recipe.service';
 
 import RecipeList from './RecipeList';
 import RecipeDialog from './RecipeDialog';
@@ -23,66 +25,55 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-// Mocked data
-const initialRecipes = [{
-  id: 1,
-  name: 'Recipe 1',
-  description: 'Description blah blah blah blah',
-  ingredients: [ { id: 1, name: 'Ingredient 1' }, { id: 2, name: 'Ingredient 2'}, { id: 3, name: 'Ingredient 3'} ]
-}, {
-  id: 2,
-  name: 'Recipe 2',
-  description: 'Description blah blah blah blah',
-  ingredients: [ { id: 1, name: 'Ingredient 1' }, { id: 2, name: 'Ingredient 2'} ]
-}]
-
 function RecipeApp() {
   const classes = useStyles();
   const [ dialogOpen, toggleDialog ] = useToggle();
 
-  const [ recipes, setRecipes ] = useState(initialRecipes);
+  const [ recipes, setRecipes ] = useState([]);
+
+  useEffect(() => {
+    loadRecipes();
+  }, []);
+
+  function loadRecipes() {
+    RecipeService.getRecipes()
+      .then(response => {
+        setRecipes(response);
+      });
+  }
 
   function createRecipe(name, description) {
-    // TODO: Call API
-    const recipe = { id: uuid(), name, description };
-    setRecipes([ ...recipes, recipe ]);
+    const recipe = { name, description };
+    RecipeService.createRecipe(recipe)
+      .then(() => {
+        loadRecipes();
+      });
   }
   function updateRecipe(id, name, description) {
-    // TODO: Call API
-    const updatedRecipes = recipes.map(recipe => {
-      return recipe.id === id ?
-        { ...recipe, name, description } :
-        recipe;
-    });
-    setRecipes(updatedRecipes);
+    const recipe = { name, description };
+    RecipeService.updateRecipe(id, recipe)
+      .then(() => {
+        loadRecipes();
+      });
   }
   function deleteRecipe(id) {
-    // TODO: Call API
-    const updatedRecipes = recipes.filter(recipe => recipe.id !== id);
-    setRecipes(updatedRecipes);
+    RecipeService.deleteRecipe(id)
+      .then(() => {
+        loadRecipes();
+      });
   }
-  function createIngredient(recipeId, ingredientName) {
-    // TODO: Call API
-    const ingredient = { id: uuid(), name: ingredientName };
-    const updatedRecipes = recipes.map(recipe => {
-      if (recipe.id !== recipeId) {
-        return recipe;
-      }
-      const ingredients = [ ...(recipe.ingredients || []), ingredient ];
-      return { ...recipe, ingredients };
-    });
-    setRecipes(updatedRecipes);
+  function createIngredient(recipeId, name) {
+    const ingredient = { name };
+    IngredientService.createIngredient(recipeId, ingredient)
+      .then(() => {
+        loadRecipes();
+      });
   }
   function deleteIngredient(recipeId, ingredientId) {
-    // TODO: Call API
-    const updatedRecipes = recipes.map(recipe => {
-      if (recipe.id !== recipeId) {
-        return recipe;
-      }
-      const filteredIngredients = (recipe.ingredients || []).filter(ingredient => ingredient.id !== ingredientId);
-      return { ...recipe, ingredients: filteredIngredients }
-    });
-    setRecipes(updatedRecipes);
+    IngredientService.deleteIngredient(recipeId, ingredientId)
+      .then(() => {
+        loadRecipes();
+      });
   }
 
   return (
