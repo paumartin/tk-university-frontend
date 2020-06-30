@@ -11,7 +11,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import IngredientList from './IngredientList';
 
 function RecipeDetail(props) {
-  const { id, name, description, ingredients, createIngredient, deleteIngredient } = props;
+  const { id, name, description, ingredients = [], createIngredient, deleteIngredient } = props;
 
   return (
     <Card>

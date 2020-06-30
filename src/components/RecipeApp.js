@@ -1,33 +1,60 @@
 import React, { useState } from 'react';
 import { v4 as uuid } from 'uuid';
+
+import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
+import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 
+import useToggle from '../hooks/useToggle';
+
 import RecipeList from './RecipeList';
+import RecipeDialog from './RecipeDialog';
+
+const useStyles = makeStyles(theme => ({
+  appBar: {
+    position: 'static',
+    height: '64px'
+  },
+  title: {
+    flexGrow: 1
+  }
+}));
+
+// Mocked data
+const initialRecipes = [{
+  id: 1,
+  name: 'Recipe 1',
+  description: 'Description blah blah blah blah',
+  ingredients: [ { id: 1, name: 'Ingredient 1' }, { id: 2, name: 'Ingredient 2'}, { id: 3, name: 'Ingredient 3'} ]
+}, {
+  id: 2,
+  name: 'Recipe 2',
+  description: 'Description blah blah blah blah',
+  ingredients: [ { id: 1, name: 'Ingredient 1' }, { id: 2, name: 'Ingredient 2'} ]
+}]
 
 function RecipeApp() {
-  const initialRecipes = [{
-    id: 1,
-    name: 'Recipe 1',
-    description: 'Description blah blah blah blah',
-    ingredients: [ { id: 1, name: 'Ingredient 1' }, { id: 2, name: 'Ingredient 2'}, { id: 3, name: 'Ingredient 3'} ]
-  }, {
-    id: 2,
-    name: 'Recipe 2',
-    description: 'Description blah blah blah blah',
-    ingredients: [ { id: 1, name: 'Ingredient 1' }, { id: 2, name: 'Ingredient 2'} ]
-  }]
+  const classes = useStyles();
+  const [ dialogOpen, toggleDialog ] = useToggle();
+
   const [ recipes, setRecipes ] = useState(initialRecipes);
 
+  function createRecipe(name, description) {
+    // TODO: Call API
+    const recipe = { id: uuid(), name, description };
+    setRecipes([ ...recipes, recipe ]);
+  }
   function createIngredient(recipeId, ingredientName) {
+    // TODO: Call API
     const ingredient = { id: uuid(), name: ingredientName };
     const updatedRecipes = recipes.map(recipe => {
       if (recipe.id !== recipeId) {
         return recipe;
       }
-      const ingredients = [ ...(recipe.ingredients || [] ), ingredient ];
+      const ingredients = [ ...(recipe.ingredients || []), ingredient ];
       return { ...recipe, ingredients };
     });
     setRecipes(updatedRecipes);
@@ -54,15 +81,22 @@ function RecipeApp() {
       }}
       elevation={0}
     >
-      <AppBar color='primary' position='static' style={{ height: '64px' }}>
+      <AppBar className={classes.appBar}>
         <Toolbar>
-          <Typography color='inherit'>RECIPES APP</Typography>
+          <Typography color='inherit' className={classes.title}>RECIPES APP</Typography>
+          <Button color="inherit" onClick={toggleDialog}>Create recipe</Button>
         </Toolbar>
       </AppBar>
       <RecipeList
         recipes={recipes}
         createIngredient={createIngredient}
         deleteIngredient={deleteIngredient}
+      />
+      <RecipeDialog
+        dialogTitle='Create recipe'
+        open={dialogOpen}
+        toggleDialog={toggleDialog}
+        sendForm={createRecipe}
       />
     </Paper>
   );
